@@ -1,0 +1,9 @@
+[package]
+name = "flying-bot"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+azalea = "0.16.0"
+eyre = "0.6.12"
+tokio = { version = "1.50.0", features = ["macros", "rt-multi-thread"] }
