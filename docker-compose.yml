@@ -1,3 +1,8 @@
+x-flying-bot: &flying-bot
+  build: .
+  image: flying-bot
+  restart: unless-stopped
+
 services:
   steel:
     image: steel:latest
@@ -6,26 +11,42 @@ services:
       - ../saves:/steel/saves
     ports:
       - 25565:25565
-  east:
-    build: .
-    image: flying-bot
-    command: ["east", "steel", "flying_bot_east"]
-    restart: unless-stopped
 
-  west:
-    build: .
-    image: flying-bot
-    command: ["west", "steel", "flying_bot_west"]
-    restart: unless-stopped
+  south_overworld:
+    <<: *flying-bot
+    command: ["0.0", "overworld", "steel", "flying_bot_south_overworld"]
+  east_overworld:
+    <<: *flying-bot
+    command: ["-90.0", "overworld", "steel", "flying_bot_east_overworld"]
+  north_overworld:
+    <<: *flying-bot
+    command: ["180.0", "overworld", "steel", "flying_bot_north_overworld"]
+  west_overworld:
+    <<: *flying-bot
+    command: ["90.0", "overworld", "steel", "flying_bot_west_overworld"]
 
-  south:
-    build: .
-    image: flying-bot
-    command: ["south", "steel", "flying_bot_south"]
-    restart: unless-stopped
+  south_nether:
+    <<: *flying-bot
+    command: ["0.0", "nether", "steel", "flying_bot_south_nether"]
+  east_nether:
+    <<: *flying-bot
+    command: ["-90.0", "nether", "steel", "flying_bot_east_nether"]
+  north_nether:
+    <<: *flying-bot
+    command: ["180.0", "nether", "steel", "flying_bot_north_nether"]
+  west_nether:
+    <<: *flying-bot
+    command: ["90.0", "nether", "steel", "flying_bot_west_nether"]
 
-  north:
-    build: .
-    image: flying-bot
-    command: ["north", "steel", "flying_bot_north"]
-    restart: unless-stopped
+  south_end:
+    <<: *flying-bot
+    command: ["0.0", "end", "steel", "flying_bot_south_end"]
+  east_end:
+    <<: *flying-bot
+    command: ["-90.0", "end", "steel", "flying_bot_east_end"]
+  north_end:
+    <<: *flying-bot
+    command: ["180.0", "end", "steel", "flying_bot_north_end"]
+  west_end:
+    <<: *flying-bot
+    command: ["90.0", "end", "steel", "flying_bot_west_end"]

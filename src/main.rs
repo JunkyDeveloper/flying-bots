@@ -19,15 +19,24 @@ async fn main() -> AppExit {
     ClientBuilder::new()
         .set_handler(handle)
         .set_state(State {
-            direction: args.direction,
+            degree: args.degree,
+            dimension: args.dimension,
         })
         .start(account, args.server)
         .await
 }
 
 #[derive(Clone, Debug)]
+enum Dimension {
+    Overworld,
+    Nether,
+    End,
+}
+
+#[derive(Clone, Debug)]
 struct Args {
-    direction: Direction,
+    degree: f32,
+    dimension: Dimension,
     server: String,
     username: String,
 }
@@ -35,17 +44,16 @@ struct Args {
 impl Args {
     fn parse_or_exit() -> Self {
         let mut args = env::args().skip(1);
-        let Some(direction) = args.next() else {
-            print_usage_and_exit();
-        };
-
-        let direction = direction.parse().unwrap_or_else(|message| {
-            eprintln!("{message}");
-            print_usage_and_exit();
-        });
-
         Self {
-            direction,
+            degree: args.next().unwrap_or("0.0".to_owned()).parse().unwrap_or(0.0),
+            dimension: args
+                .next()
+                .unwrap_or("overworld".to_owned())
+                .parse()
+                .unwrap_or_else(|message| {
+                    eprintln!("{message}");
+                    print_usage_and_exit();
+                }),
             server: args.next().unwrap_or_else(|| "localhost".to_owned()),
             username: args.next().unwrap_or_else(|| "flying_bot".to_owned()),
         }
@@ -53,61 +61,34 @@ impl Args {
 }
 
 fn print_usage_and_exit() -> ! {
-    eprintln!("Usage: cargo run -- <east|west|south|north> [server] [username]");
+    eprintln!("Usage: cargo run -- <degree> <dimension> [server] [username]");
     process::exit(2);
 }
 
-#[derive(Clone, Copy, Debug)]
-enum Direction {
-    East,
-    West,
-    South,
-    North,
-}
-
-impl Direction {
-    fn yaw(self) -> f32 {
-        match self {
-            Self::South => 0.0,
-            Self::West => 90.0,
-            Self::North => 180.0,
-            Self::East => -90.0,
-        }
-    }
-
-    fn delta(self) -> (f64, f64) {
-        match self {
-            Self::East => (CRUISE_SPEED, 0.0),
-            Self::West => (-CRUISE_SPEED, 0.0),
-            Self::South => (0.0, CRUISE_SPEED),
-            Self::North => (0.0, -CRUISE_SPEED),
-        }
-    }
-}
-
-impl std::str::FromStr for Direction {
+impl std::str::FromStr for Dimension {
     type Err = String;
 
     fn from_str(value: &str) -> Result<Self, Self::Err> {
         match value.to_ascii_lowercase().as_str() {
-            "east" => Ok(Self::East),
-            "west" => Ok(Self::West),
-            "south" => Ok(Self::South),
-            "north" => Ok(Self::North),
-            other => Err(format!("Invalid direction '{other}'")),
+            "overworld" => Ok(Self::Overworld),
+            "nether" => Ok(Self::Nether),
+            "end" => Ok(Self::End),
+            other => Err(format!("Invalid dimension '{other}'")),
         }
     }
 }
 
 #[derive(Clone, Component, Debug)]
 struct State {
-    direction: Direction,
+    degree: f32,
+    dimension: Dimension,
 }
 
 impl Default for State {
     fn default() -> Self {
         Self {
-            direction: Direction::East,
+            degree: 0.0,
+            dimension: Dimension::Overworld,
         }
     }
 }
@@ -116,15 +97,24 @@ async fn handle(bot: Client, event: Event, state: State) -> eyre::Result<()> {
     match event {
         Event::Login => {
             bot.chat("/gamemode creative");
+            match state.dimension {
+                Dimension::Overworld => {
+                    bot.chat("/steel tp @p overworld");
+                }
+                Dimension::Nether => {
+                    bot.chat("/steel tp @p the_nether");}
+                Dimension::End => {
+                    bot.chat("/steel tp @p the_end");}
+            }
         }
         Event::Tick => {
             enable_flying(&bot);
 
             if bot.position().y < TARGET_Y {
-                ascend(&bot, state.direction);
+                ascend(&bot, state.degree);
             } else {
                 bot.set_jumping(false);
-                cruise(&bot, state.direction);
+                cruise(&bot, state.degree);
             }
         }
         _ => {}
@@ -145,7 +135,7 @@ fn enable_flying(bot: &Client) {
     bot.write_packet(ServerboundPlayerAbilities { is_flying: true });
 }
 
-fn ascend(bot: &Client, direction: Direction) {
+fn ascend(bot: &Client, degree: f32) {
     bot.query_self::<(&mut Position, &mut azalea::entity::Physics), _>(|(mut pos, mut physics)| {
         pos.y = (pos.y + ASCEND_SPEED).min(TARGET_Y);
         physics.velocity = azalea::Vec3::ZERO;
@@ -154,13 +144,15 @@ fn ascend(bot: &Client, direction: Direction) {
         physics.no_jump_delay = 0;
     });
 
-    bot.set_direction(direction.yaw(), -90.0);
+    bot.set_direction(degree, -90.0);
     bot.set_jumping(false);
     bot.walk(WalkDirection::None);
 }
 
-fn cruise(bot: &Client, direction: Direction) {
-    let (dx, dz) = direction.delta();
+fn cruise(bot: &Client, degree: f32) {
+    let yaw = f64::from(degree).to_radians();
+    let dx = -yaw.sin() * CRUISE_SPEED;
+    let dz = yaw.cos() * CRUISE_SPEED;
 
     bot.query_self::<(&mut Position, &mut azalea::entity::Physics), _>(|(mut pos, mut physics)| {
         pos.y = TARGET_Y;
@@ -173,6 +165,6 @@ fn cruise(bot: &Client, direction: Direction) {
     });
     println!("{:?}", bot.position());
 
-    bot.set_direction(direction.yaw(), 0.0);
+    bot.set_direction(degree, 0.0);
     bot.walk(WalkDirection::None);
 }
