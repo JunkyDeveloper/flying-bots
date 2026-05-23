@@ -21,6 +21,7 @@ async fn main() -> AppExit {
         .set_state(State {
             degree: args.degree,
             dimension: args.dimension,
+            username: args.username,
         })
         .start(account, args.server)
         .await
@@ -45,7 +46,11 @@ impl Args {
     fn parse_or_exit() -> Self {
         let mut args = env::args().skip(1);
         Self {
-            degree: args.next().unwrap_or("0.0".to_owned()).parse().unwrap_or(0.0),
+            degree: args
+                .next()
+                .unwrap_or("0.0".to_owned())
+                .parse()
+                .unwrap_or(0.0),
             dimension: args
                 .next()
                 .unwrap_or("overworld".to_owned())
@@ -82,6 +87,7 @@ impl std::str::FromStr for Dimension {
 struct State {
     degree: f32,
     dimension: Dimension,
+    username: String,
 }
 
 impl Default for State {
@@ -89,6 +95,7 @@ impl Default for State {
         Self {
             degree: 0.0,
             dimension: Dimension::Overworld,
+            username: "flying_bot".to_owned(),
         }
     }
 }
@@ -99,12 +106,14 @@ async fn handle(bot: Client, event: Event, state: State) -> eyre::Result<()> {
             bot.chat("/gamemode creative");
             match state.dimension {
                 Dimension::Overworld => {
-                    bot.chat("/steel tp @p overworld");
+                    bot.chat(format!("/steel tp {} overworld", state.username));
                 }
                 Dimension::Nether => {
-                    bot.chat("/steel tp @p the_nether");}
+                    bot.chat(format!("/steel tp {} the_nether", state.username));
+                }
                 Dimension::End => {
-                    bot.chat("/steel tp @p the_end");}
+                    bot.chat(format!("/steel tp {} the_end", state.username));
+                }
             }
         }
         Event::Tick => {
