@@ -1,32 +1,29 @@
 services:
+  steel:
+    image: steel:latest
+    volumes:
+      - ../config /steel/config
+      - ../saves /steel/saves
   east:
     build: .
     image: flying-bot
-    command: ["east", "${SERVER_ADDR:-host.docker.internal:25565}", "flying_bot_east"]
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    command: ["east", "steel", "flying_bot_east"]
     restart: unless-stopped
 
   west:
     build: .
     image: flying-bot
-    command: ["west", "${SERVER_ADDR:-host.docker.internal:25565}", "flying_bot_west"]
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    command: ["west", "steel", "flying_bot_west"]
     restart: unless-stopped
 
   south:
     build: .
     image: flying-bot
-    command: ["south", "${SERVER_ADDR:-host.docker.internal:25565}", "flying_bot_south"]
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    command: ["south", "steel", "flying_bot_south"]
     restart: unless-stopped
 
   north:
     build: .
     image: flying-bot
-    command: ["north", "${SERVER_ADDR:-host.docker.internal:25565}", "flying_bot_north"]
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    command: ["north", "steel", "flying_bot_north"]
     restart: unless-stopped
