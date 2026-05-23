@@ -2,8 +2,10 @@ services:
   steel:
     image: steel:latest
     volumes:
-      - ../config /steel/config
-      - ../saves /steel/saves
+      - ../config:/steel/config
+      - ../saves:/steel/saves
+    ports:
+      - 25565:25565
   east:
     build: .
     image: flying-bot
