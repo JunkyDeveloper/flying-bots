@@ -14,39 +14,39 @@ services:
 
   south_overworld:
     <<: *flying-bot
-    command: ["0.0", "overworld", "steel", "flying_bot_south_overworld"]
+    command: ["0.0", "overworld", "steel", "fb_south_over"]
   east_overworld:
     <<: *flying-bot
-    command: ["-90.0", "overworld", "steel", "flying_bot_east_overworld"]
+    command: ["-90.0", "overworld", "steel", "fb_east_over"]
   north_overworld:
     <<: *flying-bot
-    command: ["180.0", "overworld", "steel", "flying_bot_north_overworld"]
+    command: ["180.0", "overworld", "steel", "fb_north_over"]
   west_overworld:
     <<: *flying-bot
-    command: ["90.0", "overworld", "steel", "flying_bot_west_overworld"]
+    command: ["90.0", "overworld", "steel", "fb_west_over"]
 
   south_nether:
     <<: *flying-bot
-    command: ["0.0", "nether", "steel", "flying_bot_south_nether"]
+    command: ["0.0", "nether", "steel", "fb_south_nether"]
   east_nether:
     <<: *flying-bot
-    command: ["-90.0", "nether", "steel", "flying_bot_east_nether"]
+    command: ["-90.0", "nether", "steel", "fb_east_nether"]
   north_nether:
     <<: *flying-bot
-    command: ["180.0", "nether", "steel", "flying_bot_north_nether"]
+    command: ["180.0", "nether", "steel", "fb_north_nether"]
   west_nether:
     <<: *flying-bot
-    command: ["90.0", "nether", "steel", "flying_bot_west_nether"]
+    command: ["90.0", "nether", "steel", "fb_west_nether"]
 
   south_end:
     <<: *flying-bot
-    command: ["0.0", "end", "steel", "flying_bot_south_end"]
+    command: ["0.0", "end", "steel", "fb_south_end"]
   east_end:
     <<: *flying-bot
-    command: ["-90.0", "end", "steel", "flying_bot_east_end"]
+    command: ["-90.0", "end", "steel", "fb_east_end"]
   north_end:
     <<: *flying-bot
-    command: ["180.0", "end", "steel", "flying_bot_north_end"]
+    command: ["180.0", "end", "steel", "fb_north_end"]
   west_end:
     <<: *flying-bot
-    command: ["90.0", "end", "steel", "flying_bot_west_end"]
+    command: ["90.0", "end", "steel", "fb_west_end"]
